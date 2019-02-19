@@ -5,7 +5,7 @@ import os, sys, requests
 from PIL import Image
 from utils import *; logstart('cimg')
 
-def ascii(img, size, chars='█', *, padding=0, padchar=' ', bgcolor=None, double_vres=False): # ░▒▓█
+def ascii(img, size, chars='█', *, padding=0, padchar=' ', bgcolor=None, double_vres=False, resample=0): # ░▒▓█
 	"""
 	img: PIL Image, Image.open arg or URL as str.
 	size: (w, h) int tuple or single int to use as length of one or both sides of output.
@@ -13,6 +13,7 @@ def ascii(img, size, chars='█', *, padding=0, padchar=' ', bgcolor=None, doubl
 	padding=0: prefix every line with N `padchar`s.
 	padchar=' ': character to use as left-padding.
 	double_vres=False: double the vertical size and use bg color as the bottom pixel for half-block chars (i.e. '▀').
+	resample=0: Image.resize() resampling mode.
 	"""
 	img = openimg(img)
 	if (double_vres and chars == '█'): chars = '▀'
@@ -26,7 +27,7 @@ def ascii(img, size, chars='█', *, padding=0, padchar=' ', bgcolor=None, doubl
 		img.paste(img_o, mask=img_o)
 	if (color): img = img.convert('RGBA')
 	else: img = img.convert('L')
-	img = img.resize(size)
+	img = img.resize(size, resample)
 	px = img.load()
 	padchar *= padding
 	r = str()
@@ -59,12 +60,14 @@ def main():
 	argparser.add_argument('-padding', metavar='N', type=int)
 	argparser.add_argument('-padchar')
 	argparser.add_argument('-bgcolor', metavar='color')
+	argparser.add_argument('-resample', metavar='mode')
 	argparser.add_argument('--ascii', action='store_true')
 	cargs = argparser.parse_args()
 
 	kwargs = dict(filter(operator.itemgetter(1), S(cargs.__dict__).translate({'double_vres': 'ascii'}, strict=False)(*({i.dest for i in argparser._actions}-known_args)).items()))
 	size = Sstr(kwargs['size']).bool(minus_one=False)
 	kwargs['size'] = tuple(map(int, kwargs['size'].split('x'))) if (size) else os.get_terminal_size()
+	if ('resample' in kwargs): kwargs['resample'] = getattr(Image, kwargs['resample'].upper())
 	if (not size): sys.stderr.write('\033c')
 	sys.stdout.write(ascii(**kwargs)); sys.stdout.flush()
 	if (size): sys.stderr.write('\n'); return
