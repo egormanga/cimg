@@ -1,0 +1,7 @@
+cimg/
+test.jpg
+**.db
+**.log
+**.old
+**__pycache__
+**_config.py
