@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 # Python console image view library
 
-import os, sys, requests
 from PIL import Image
-from utils import *; logstart('cimg')
+from utils.nolog import *; logstart('cimg')
 
-def ascii(img, size, chars='█', *, padding=0, padchar=' ', bgcolor=None, double_vres=False, resample=0): # ░▒▓█
+def ascii(*args, **kwargs): logexception(DeprecationWarning(" *** ascii() → showimg() *** ")); return showimg(*args, **kwargs)
+
+def showimg(img, size, chars='█', *, padding=0, padchar=' ', bgcolor=None, double_vres=False, resample=0): # ░▒▓█
 	"""
 	img: PIL Image, Image.open arg or URL as str.
 	size: (w, h) int tuple or single int to use as length of one or both sides of output.
@@ -49,6 +50,7 @@ def openimg(img):
 	if (Image.isImageType(img)): return img
 	try: return Image.open(img)
 	except Exception:
+		import requests
 		try: return Image.open(requests.get(img, stream=True).raw)
 		except Exception: ex = True
 		if (ex): raise
@@ -69,7 +71,7 @@ def main():
 	kwargs['size'] = tuple(map(int, kwargs['size'].split('x'))) if (size) else os.get_terminal_size()
 	if ('resample' in kwargs): kwargs['resample'] = getattr(Image, kwargs['resample'].upper())
 	if (not size): sys.stderr.write('\033c')
-	sys.stdout.write(ascii(**kwargs)); sys.stdout.flush()
+	sys.stdout.write(showimg(**kwargs)); sys.stdout.flush()
 	if (size): sys.stderr.write('\n'); return
 	try: sys.stdin.read(1)
 	except: pass
