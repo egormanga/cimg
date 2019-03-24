@@ -48,7 +48,7 @@ def pixel(img, char='●'): return '\033[1;38;2;'+';'.join(map(str, openimg(img)
 
 def openimg(img):
 	if (Image.isImageType(img)): return img
-	try: return Image.open(img)
+	try: return Image.open(open(img, 'rb') if (isinstance(img, str)) else img)
 	except Exception:
 		import requests
 		try: return Image.open(requests.get(img, stream=True).raw)
