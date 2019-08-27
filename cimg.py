@@ -2,19 +2,20 @@
 # Python console image view library
 
 from PIL import Image
-from utils.nolog import *; logstart('cimg')
+from utils.nolog import *
 
 def ascii(*args, **kwargs): logexception(DeprecationWarning(" *** ascii() → showimg() *** ")); return showimg(*args, **kwargs)
 
 def showimg(img, size, chars='█', *, padding=0, padchar=' ', bgcolor=None, double_vres=False, resample=0): # ░▒▓█
-	"""
-	img: PIL Image, Image.open arg or URL as str.
-	size: (w, h) int tuple or single int to use as length of one or both sides of output.
-	chars='█': multiple chars (i.e. '░▒▓█') to use as b/w palette or single (i.e. '█') for RGB (ANSI-escape) mode.
-	padding=0: prefix every line with N `padchar`s.
-	padchar=' ': character to use as left-padding.
-	double_vres=False: double the vertical size and use bg color as the bottom pixel for half-block chars (i.e. '▀').
-	resample=0: Image.resize() resampling mode.
+	""" Render an Image.
+	Parameters:
+		img: PIL Image, Image.open arg or URL as str.
+		size: (w, h) int tuple or single int to use as length of one or both sides of output.
+		chars='█': multiple chars (i.e. '░▒▓█') to use as b/w palette or single (i.e. '█') for RGB (ANSI-escape) mode.
+		padding=0: prefix every line with N `padchar`s.
+		padchar=' ': character to use as left-padding.
+		double_vres=False: double the vertical size and use bg color as the bottom pixel for half-block chars (i.e. '▀').
+		resample=0: Image.resize() resampling mode.
 	"""
 	img = openimg(img)
 	if (double_vres and chars == '█'): chars = '▀'
@@ -78,7 +79,6 @@ def main():
 	sys.stderr.write('\033c')
 	sys.stderr.flush()
 
-if (__name__ == '__main__'): logstarted(); main()
-else: logimported()
+if (__name__ == '__main__'): exit(main())
 
-# by Sdore, 2018
+# by Sdore, 2019
