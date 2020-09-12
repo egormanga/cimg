@@ -3,5 +3,6 @@ test.jpg
 **.db
 **.log
 **.old
+**.bak
 **__pycache__
 **_config.py

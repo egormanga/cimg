@@ -4,8 +4,9 @@
 from PIL import Image
 from utils.nolog import *
 
-def ascii(*args, **kwargs): logexception(DeprecationWarning(" *** ascii() → showimg() *** ")); return showimg(*args, **kwargs)
+export(Image)
 
+@export
 def showimg(img, size, chars='█', *, padding=0, padchar=' ', bgcolor=None, double_vres=False, resample=0): # ░▒▓█
 	""" Render an Image.
 	Parameters:
@@ -45,11 +46,16 @@ def showimg(img, size, chars='█', *, padding=0, padchar=' ', bgcolor=None, dou
 		if (y+1+double_vres < size[1]): r += '\n'
 	return r
 
-def pixel(img, char='●'): return '\033[1;38;2;'+';'.join(map(str, openimg(img).resize((1, 1)).convert('RGB').load()[0,0]))+'m'+char+'\033[0m'
+@export
+def pixel_color(img): return openimg(img).resize((1, 1)).convert('RGB').load()[0,0]
 
+@export
+def pixel(img, char='●'): return '\033[1;38;2;'+';'.join(map(str, pixel_color(img)))+'m'+char+'\033[0m'
+
+@export
 def openimg(img):
 	if (Image.isImageType(img)): return img
-	try: return Image.open(open(img, 'rb') if (isinstance(img, str)) else img)
+	try: return Image.open(open(img.split('file://', maxsplit=1)[-1], 'rb') if (isinstance(img, str)) else img)
 	except Exception:
 		import requests
 		try: return Image.open(requests.get(img, stream=True).raw)
@@ -65,12 +71,14 @@ def main():
 	argparser.add_argument('-bgcolor', metavar='color')
 	argparser.add_argument('-resample', metavar='mode')
 	argparser.add_argument('--ascii', action='store_true')
+	argparser.add_argument('--noansi', action='store_true')
 	cargs = argparser.parse_args()
 
 	kwargs = dict(filter(operator.itemgetter(1), S(cargs.__dict__).translate({'double_vres': 'ascii'}, strict=False)(*({i.dest for i in argparser._actions}-known_args)).items()))
 	size = Sstr(kwargs['size']).bool(minus_one=False)
 	kwargs['size'] = tuple(map(int, kwargs['size'].split('x'))) if (size) else os.get_terminal_size()
 	if ('resample' in kwargs): kwargs['resample'] = getattr(Image, kwargs['resample'].upper())
+	if (kwargs.pop('noansi', False)): kwargs['chars'] = ' ░▒▓█'
 	if (not size): sys.stderr.write('\033c')
 	sys.stdout.write(showimg(**kwargs)); sys.stdout.flush()
 	if (size): sys.stderr.write('\n'); return
@@ -79,6 +87,6 @@ def main():
 	sys.stderr.write('\033c')
 	sys.stderr.flush()
 
-if (__name__ == '__main__'): exit(main())
+if (__name__ == '__main__'): exit(main(), nolog=True)
 
-# by Sdore, 2019
+# by Sdore, 2020
