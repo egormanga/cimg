@@ -1,8 +1,7 @@
-cimg/
-test.jpg
-**.db
-**.log
-**.old
-**.bak
-**__pycache__
-**_config.py
+tests/
+*.db
+*.log
+*.old
+*.bak
+*__pycache__
+*_config.py
