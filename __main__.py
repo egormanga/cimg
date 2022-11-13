@@ -1,1 +1,3 @@
-cimg.py
+if (__name__ == '__main__'):
+	from . import exit, main
+	raise exit(main())

@@ -1,1 +1,2 @@
-cimg.py
+from .cimg import *
+del cimg
